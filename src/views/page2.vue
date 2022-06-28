@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <van-nav-bar
-      title="标题"
+      title="第二页"
       left-text="返回"
       left-arrow
       @click-left="onClickLeft"
@@ -12,6 +12,7 @@
 <script>
 import { useStore } from 'vuex'
 import { reactive, ref, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'HelloWorld',
@@ -19,6 +20,7 @@ export default {
     msg: String
   },
   setup(props) {
+    const router = useRouter()
     console.log(props)
     let store = useStore();
     let text = ref(store.state.userStore.token)
@@ -27,7 +29,7 @@ export default {
       name: store.state.userStore.token,
       age: 21
     })
-    const onClickLeft = () => history.back();
+    const onClickLeft = () => router.go(-1);
     return {
       onClickLeft, ...toRefs(state), text
     };

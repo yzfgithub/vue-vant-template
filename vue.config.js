@@ -11,3 +11,19 @@
 //     ],
 //   },
 // };
+
+module.exports = {
+    devServer: {
+        proxy: {
+            '/apiservice': {
+                target: 'http://xxxxxx',
+                ws: true,
+                secure: false,
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/apiservice': ''
+                }
+            }
+        }
+    }
+}

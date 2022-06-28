@@ -1,23 +1,22 @@
 <template>
   <div class="hello">
-    <van-button plain type="primary" @click="changeStore">朴素按钮</van-button>
-    <van-button disabled type="primary">禁用状态</van-button>
+    <van-nav-bar
+      title="首页"
+    />
+    <van-button plain type="primary" @click="changeStore">修改store状态</van-button>
+    <van-button type="primary" @click="toNextPage">跳转第二页</van-button>
     <van-cell title="albb" :value="name"></van-cell>
     <van-cell title="tx" :value="age"></van-cell>
     <van-cell title="jd" :value="text"></van-cell>
     <van-cell title="aa" :value="sd.value"></van-cell>
-    <van-nav-bar
-      title="标题"
-      left-text="返回"
-      left-arrow
-      @click-left="onClickLeft"
-    />
   </div>
 </template>
 
 <script>
 import { useStore } from 'vuex'
-import { reactive, ref, toRefs, watch, computed } from 'vue'
+import { reactive, ref, toRefs, watch, computed, onMounted } from 'vue'
+import { getLoginUser } from '@/api/index'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'HelloWorld',
@@ -25,6 +24,7 @@ export default {
     msg: String
   },
   setup(props) {
+    const router = useRouter()
     console.log(props)
     let store = useStore();
     let text = ref(store.state.userStore.token)
@@ -32,10 +32,7 @@ export default {
       name: store.state.userStore.token,
       age: 21
     })
-    const onClickLeft = () => history.back();
-    const changeStore = () => {
-        store.dispatch('setTokenActions', 'change-store')
-    }
+
 
     const sd = computed(() => {
         console.log('lala')
@@ -45,8 +42,24 @@ export default {
     watch(sd, (newV, oldV) => {
         console.log(newV, oldV, 'val')
     })
+
+    onMounted(() => {
+      testFun();
+    })
+
+    const toNextPage = () => router.push('/page2')
+    const changeStore = () => {
+      const random = (Math.random()*100).toFixed(2)
+        store.dispatch('setTokenActions', random)
+        
+    }
+    const testFun = async () => {
+        const res  = await getLoginUser();
+        console.log(res);
+    }
+
     return {
-      onClickLeft, changeStore, ...toRefs(state), text, sd
+      toNextPage, changeStore, ...toRefs(state), text, sd
     };
   }
 }
