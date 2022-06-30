@@ -3,12 +3,44 @@
     <van-nav-bar
       title="首页"
     />
+    <div class="home-ctn">
+      <van-cell title="测试文本1" :value="name"></van-cell>
+      <van-cell title="测试文本2" :value="age"></van-cell>
+      <van-cell title="测试文本3" :value="sd.value"></van-cell>
+      <br>
+      <div class="test">field测试</div>
+      <van-field v-model="testObj.userName" autocomplete="off" label="测试输入" input-align="right" placeholder="请输入用户名" />
+      <van-field 
+          readonly
+          clickable
+          name="afterBusinessUnitName"
+          required
+          input-align="right"
+          class="error"
+          v-model="testObj.afterBusinessUnitName"
+          label="业务单位"
+          :rules="[{ required: true, message: '请选择业务单位' }]"
+          placeholder="请选择"
+          is-link
+          @click="showBusinessUnit = true" />
+    </div>
+    <div>
+      
+    </div>
+
     <van-button plain type="primary" @click="changeStore">修改store状态</van-button>
     <van-button type="primary" @click="toNextPage">跳转第二页</van-button>
-    <van-cell title="albb" :value="name"></van-cell>
-    <van-cell title="tx" :value="age"></van-cell>
-    <van-cell title="jd" :value="text"></van-cell>
-    <van-cell title="aa" :value="sd.value"></van-cell>
+
+    <van-popup v-model:show="showBusinessUnit" position="bottom">
+      <van-picker
+        show-toolbar
+        :defaultIndex="unitDefaultIndex"
+        :columns="businessColumns"
+        value-key="label"
+        @confirm="businessConfirm"
+        @cancel="showBusinessUnit = false"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -24,15 +56,22 @@ export default {
     msg: String
   },
   setup(props) {
-    const router = useRouter()
     console.log(props)
+
+    const router = useRouter()
     let store = useStore();
+
     let text = ref(store.state.userStore.token)
     let state = reactive({
+      
       name: store.state.userStore.token,
-      age: 21
-    })
+      age: 21,
 
+      unitDefaultIndex: 1,
+      businessColumns: [],
+      showBusinessUnit: false,
+    })
+    let testObj = reactive({});
 
     const sd = computed(() => {
         console.log('lala')
@@ -46,39 +85,57 @@ export default {
     onMounted(() => {
       testFun();
     })
+    const testFun = async () => {
 
-    const toNextPage = () => router.push('/page2')
+        state['businessColumns'] = [{label: '1', value: '1'},{label: '2', value: '2'}];
+
+        const res  = await getLoginUser();
+        console.log(res);
+
+    }
+
+    const businessConfirm = (val) => {
+      testObj['afterBusinessUnitName'] = val.value
+      state['showBusinessUnit'] = false
+    }
+
     const changeStore = () => {
       const random = (Math.random()*100).toFixed(2)
         store.dispatch('setTokenActions', random)
         
     }
-    const testFun = async () => {
-        const res  = await getLoginUser();
-        console.log(res);
+    const toNextPage = () => {
+      console.log(state.obj)
+      router.push('/page2')
     }
 
     return {
-      toNextPage, changeStore, ...toRefs(state), text, sd
+      toNextPage, changeStore, businessConfirm, ...toRefs(state),testObj, text, sd
     };
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
+<style lang="scss" scoped>
+.home-ctn{
+  padding: 16px;
 }
-ul {
-  list-style-type: none;
+
+.test{
+  font-size: 18px;
+  text-align: left;
+}
+::v-deep .van-cell {
   padding: 0;
+  .van-cell__title{
+    text-align: left;
+  }
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+::v-deep .van-field {
+  margin: 20px 0;
+  .van-field__value{
+    text-align: right;
+  }
 }
 </style>
